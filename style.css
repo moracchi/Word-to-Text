@@ -11,24 +11,59 @@ body {
     color: #1f2937;
 }
 
+/* Header */
 .header {
+    background-color: #2c3e50;
+    color: #ecf0f1;
+    padding: 20px 0;
     text-align: center;
-    padding: 20px;
-    color: white;
+    position: relative; /* For positioning the nav */
 }
 
 .header h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
+    margin: 0;
+    font-size: 2.5em;
+    letter-spacing: 1px;
 }
 
 .header p {
-    font-size: 1.1rem;
+    margin: 5px 0 0;
+    font-size: 1.1em;
     opacity: 0.9;
-    font-weight: 300;
 }
+
+/* Top Right Navigation */
+.top-right-nav {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+
+.top-right-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.top-right-nav li {
+    display: inline-block;
+    margin-left: 15px;
+}
+
+.top-right-nav a {
+    color: #ecf0f1;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.top-right-nav a:hover {
+    background-color: #34495e;
+}
+
+/* Main Container */
 
 .container {
     max-width: 1400px;
