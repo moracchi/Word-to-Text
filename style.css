@@ -12,21 +12,20 @@ body {
 }
 
 /* Header */
-.header {
-    background-color: #2c3e50;
-    color: #ecf0f1;
-    padding: 20px 0;
+header {
+    background-color: #0da574;
+    color: #fff;
+    padding: 20px;
     text-align: center;
-    position: relative; /* For positioning the nav */
 }
 
-.header h1 {
+header h1 {
     margin: 0;
     font-size: 2.5em;
     letter-spacing: 1px;
 }
 
-.header p {
+header p {
     margin: 5px 0 0;
     font-size: 1.1em;
     opacity: 0.9;
