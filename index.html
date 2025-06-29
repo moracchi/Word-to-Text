@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Word→TEXT | Advanced Document Processor</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Word→TEXT</h1>
+        <p>高機能Word文書テキスト抽出ツール</p>
+    </div>
+
+    <div class="container">
+        <!-- サイドパネル -->
+        <div class="sidebar">
+            <div class="settings-panel">
+                <h3>設定</h3>
+                
+                <div class="setting-group">
+                    <label>出力形式</label>
+                    <select id="outputFormat">
+                        <option value="text">プレーンテキスト</option>
+                        <option value="markdown">Markdown</option>
+                        <option value="html">HTML</option>
+                        <option value="json">JSON</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="preserveFormatting" checked>
+                        書式保持
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="includeImages" checked>
+                        画像情報含む
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="extractTables" checked>
+                        表の抽出
+                    </label>
+                </div>
+
+                <div class="setting-group">
+                    <label>
+                        <input type="checkbox" id="removeEmptyLines">
+                        空行を削除
+                    </label>
+                </div>
+            </div>
+
+            <div class="history-panel">
+                <h3>処理履歴</h3>
+                <div id="historyList" class="history-list">
+                    <p class="no-history">履歴がありません</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- メインコンテンツ -->
+        <div class="main-content">
+            <div class="upload-section" id="uploadArea">
+                <div class="upload-icon">📝</div>
+                <div class="upload-text">
+                    <strong>Word文書をアップロード</strong><br>
+                    複数ファイル対応・ドラッグ＆ドロップ対応
+                </div>
+                <input type="file" id="fileInput" accept=".docx,.doc" multiple />
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    📁 ファイルを選択
+                </button>
+                <div class="file-info">対応形式: .docx, .doc（最大30MB）</div>
+            </div>
+
+            <div id="fileQueue" class="file-queue"></div>
+            
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">文書を処理中...</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+            
+            <div id="output" class="output-section">
+                <div class="output-header">
+                    <div class="output-title">抽出結果</div>
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="テキスト内検索...">
+                        <button class="btn btn-sm" onclick="searchText()">🔍</button>
+                    </div>
+                    <div class="action-buttons">
+                        <button class="btn btn-secondary" onclick="clearResults()">
+                            🗑️ クリア
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyText()">
+                            📋 コピー
+                        </button>
+                        <button class="btn btn-success" onclick="downloadText()">
+                            💾 ダウンロード
+                        </button>
+                    </div>
+                </div>
+
+                <div class="tabs">
+                    <button class="tab-btn active" onclick="switchTab('text')">テキスト</button>
+                    <button class="tab-btn" onclick="switchTab('preview')">プレビュー</button>
+                    <button class="tab-btn" onclick="switchTab('analysis')">分析</button>
+                    <button class="tab-btn" onclick="switchTab('structure')">構造</button>
+                </div>
+
+                <div id="textTab" class="tab-content active">
+                    <textarea id="extractedText" class="text-output" readonly placeholder="抽出されたテキストがここに表示されます..."></textarea>
+                </div>
+
+                <div id="previewTab" class="tab-content">
+                    <div id="previewContent" class="preview-content"></div>
+                </div>
+
+                <div id="analysisTab" class="tab-content">
+                    <div class="analysis-grid">
+                        <div class="analysis-card">
+                            <h4>基本統計</h4>
+                            <div class="stats">
+                                <div class="stat-item">
+                                    <span>📊 文字数:</span>
+                                    <span class="stat-value" id="charCount">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span>📝 単語数:</span>
+                                    <span class="stat-value" id="wordCount">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span>📏 行数:</span>
+                                    <span class="stat-value" id="lineCount">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span>📋 段落数:</span>
+                                    <span class="stat-value" id="paragraphCount">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="analysis-card">
+                            <h4>文字頻度分析</h4>
+                            <div id="wordFrequency" class="word-frequency"></div>
+                        </div>
+
+                        <div class="analysis-card">
+                            <h4>言語検出</h4>
+                            <div id="languageDetection" class="language-info"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="structureTab" class="tab-content">
+                    <div class="structure-analysis">
+                        <div class="structure-card">
+                            <h4>文書構造</h4>
+                            <div id="documentStructure" class="structure-tree"></div>
+                        </div>
+                        <div class="structure-card">
+                            <h4>書式情報</h4>
+                            <div id="formattingInfo" class="formatting-info"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- モーダル -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
